@@ -20,8 +20,6 @@ export class OpenAISessionHandler {
   responseText = ''
   openaiWS: WebSocket | null
   responseAudioChunks: string[] = []
-  transcriptionCompleted = false
-  pendingResponseDeltas: string[] = []
 
   constructor(socket: Socket) {
     this.socket = socket
@@ -148,14 +146,6 @@ export class OpenAISessionHandler {
   handleResponseTextDelta(data: ResponseTextDelta) {
     if (data) {
       console.log('Texto da resposta (parcial):', data.delta)
-
-      // Se a transcrição ainda não foi completada, armazena em buffer
-      if (!this.transcriptionCompleted) {
-        this.pendingResponseDeltas.push(data.delta)
-        return
-      }
-
-      // Se a transcrição foi completada, processa normalmente
       this.responseText += data.delta
       this.socket.emit('response_text_delta', data.delta)
     }
@@ -165,16 +155,6 @@ export class OpenAISessionHandler {
     if (this.responseText) {
       this.socket.emit('response_text_final', this.responseText)
     }
-  }
-
-  processPendingResponseDeltas() {
-    // Processa todos os deltas que estavam em buffer
-    for (const delta of this.pendingResponseDeltas) {
-      this.responseText += delta
-      this.socket.emit('response_text_delta', delta)
-    }
-    // Limpa o buffer
-    this.pendingResponseDeltas = []
   }
 
   handleResponseAudioDelta(data: ResponseAudioDelta) {
@@ -194,9 +174,6 @@ export class OpenAISessionHandler {
   handleResponseDone() {
     console.log('Resposta finalizada')
     this.responseText = ''
-    // Reset das flags para próxima conversa
-    this.transcriptionCompleted = false
-    this.pendingResponseDeltas = []
   }
 
   handleError(message: unknown) {
@@ -206,7 +183,10 @@ export class OpenAISessionHandler {
 
   handleConnectionClose() {
     console.log('Conexão com OpenAI encerrada')
-    this.socket.disconnect(true)
+    if (this.openaiWS && this.openaiWS.readyState === WebSocket.OPEN) {
+      this.openaiWS.close()
+    }
+    this.openaiWS = null
   }
 
   handleConnectionError(error: Error) {
@@ -239,9 +219,12 @@ export class OpenAISessionHandler {
   }
 
   cleanup() {
-    console.log('Cliente desconectado')
-    if (this.openaiWS) {
+    console.log('Cliente desconectado - limpando sessão')
+    if (this.openaiWS && this.openaiWS.readyState === WebSocket.OPEN) {
       this.openaiWS.close()
     }
+    this.openaiWS = null
+    this.responseAudioChunks = []
+    this.responseText = ''
   }
 }

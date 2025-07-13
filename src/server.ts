@@ -42,12 +42,20 @@ class AudioStreamingServer {
   }
 
   start(port = 3000) {
-    this.app.listen({
-      port,
-    })
+    this.app.listen(
+      {
+        port,
+      },
+      (err, address) => {
+        if (err) {
+          console.error('Erro ao iniciar servidor:', err)
+          process.exit(1)
+        }
+        console.log(`🎤 Audio Streaming Server rodando em ${address}`)
+      }
+    )
   }
 }
 
-// Inicia o servidor
 const server = new AudioStreamingServer()
 server.start()

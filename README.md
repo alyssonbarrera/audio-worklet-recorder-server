@@ -1,281 +1,382 @@
 # 🎤 Audio Streaming Server
 
-Um servidor de streaming de áudio em tempo real que integra com a API Realtime da OpenAI para transcrição e geração de respostas em áudio e texto.
+A real-time audio streaming server that integrates with OpenAI's Realtime API for transcription and generation of audio and text responses.
 
-## 📋 Índice
+## 📋 Table of Contents
 
-- [Visão Geral](#-visão-geral)
-- [Tecnologias Utilizadas](#-tecnologias-utilizadas)
-- [Pré-requisitos](#-pré-requisitos)
-- [Instalação](#-instalação)
-- [Configuração](#-configuração)
-- [Como Usar](#-como-usar)
-- [Arquitetura](#-arquitetura)
-- [Eventos WebSocket](#-eventos-websocket)
-- [API da OpenAI](#-api-da-openai)
-- [Desenvolvimento](#-desenvolvimento)
-- [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Overview](#-overview)
+- [Technologies Used](#-technologies-used)
+- [Prerequisites](#-prerequisites)
+- [Instal### Adding New Events
 
-## 🎯 Visão Geral
+1. Add the handler to the `eventHandlers` object in `OpenAISessionHandler`
+2. Implement the corresponding method to process the event
+3. Emit events to the client as needed using `this.socket.emit()`
 
-Este projeto é um servidor backend que fornece capacidades de streaming de áudio em tempo real, utilizando WebSockets para comunicação bidirecional com clientes. O servidor atua como um intermediário entre aplicações cliente e a API Realtime da OpenAI, oferecendo:
+### Main Dependencies
 
-- ✨ **Transcrição em tempo real** de áudio para texto
-- 🗣️ **Geração de respostas** em áudio e texto
-- 🔄 **Streaming bidirecional** de dados de áudio
-- 🌐 **Interface WebSocket** para comunicação em tempo real
-- 🤖 **Integração completa** com OpenAI Realtime API
+- **@fastify/cors** - CORS support for Fastify
+- **fastify** - Fast and efficient web framework
+- **socket.io** - WebSocket library for real-time communication
+- **ws** - WebSocket client for OpenAI Realtime API connection
 
-## 🛠️ Tecnologias Utilizadas
+### Development Dependencies
 
-- **Node.js** - Runtime JavaScript
-- **TypeScript** - Linguagem principal
-- **Fastify** - Framework web rápido e eficiente
-- **Socket.io** - Biblioteca para WebSockets
-- **WebSocket (ws)** - Cliente WebSocket para comunicação com OpenAI
-- **Biome** - Linter e formatador de código
+- **@biomejs/biome** - Fast linter and formatter
+- **@types/ws** - TypeScript definitions for ws
+- **ultracite** - Biome configuration preset
 
-## 📋 Pré-requisitos
+## 🔧 Troubleshootingallation)
+- [Configuration](#-configuration)
+- [How to Use](#-how-to-use)
+- [Architecture](#-architecture)
+- [WebSocket Events](#-websocket-events)
+- [OpenAI API](#-openai-api)
+- [Development](#-development)
+- [Project Structure](#-project-structure)
 
-- Node.js (versão 18 ou superior)
-- Chave de API da OpenAI com acesso à Realtime API
-- npm ou yarn
+## 🎯 Overview
 
-## 🚀 Instalação
+This project is a backend server that provides real-time audio streaming capabilities, using WebSockets for bidirectional communication with clients. The server acts as an intermediary between client applications and OpenAI's Realtime API, offering:
 
-1. **Clone o repositório:**
+- ✨ **Real-time transcription** from audio to text
+- 🗣️ **Response generation** in audio and text
+- 🔄 **Bidirectional streaming** of audio data
+- 🌐 **WebSocket interface** for real-time communication
+- 🤖 **Complete integration** with OpenAI Realtime API
+
+## 🛠️ Technologies Used
+
+- **Node.js** - JavaScript runtime (version 18 or higher)
+- **TypeScript** - Primary language with experimental strip types
+- **Fastify** - Fast and efficient web framework
+- **Socket.io** - Library for WebSockets
+- **WebSocket (ws)** - WebSocket client for communication with OpenAI
+- **Biome** - Code linter and formatter (extends ultracite configuration)
+
+## 📋 Prerequisites
+
+- Node.js (version 18 or higher)
+- OpenAI API key with access to Realtime API
+- npm or yarn
+
+## 🚀 Installation
+
+1. **Clone the repository:**
 ```bash
-git clone <url-do-repositorio>
+git clone <repository-url>
 cd audio-streaming-server
 ```
 
-2. **Instale as dependências:**
+2. **Install dependencies:**
 ```bash
 npm install
 ```
 
-3. **Configure as variáveis de ambiente:**
+3. **Configure environment variables:**
+
+Copy the example environment file and add your OpenAI API key:
+
 ```bash
 cp .env.example .env
 ```
 
-## ⚙️ Configuração
-
-### Variáveis de Ambiente
-
-Crie um arquivo `.env` na raiz do projeto com:
+Then edit `.env` with your actual OpenAI API key:
 
 ```env
-OPENAI_API_KEY=sua_chave_da_openai_aqui
+OPENAI_API_KEY=your_openai_key_here
 ```
 
-### Configuração do CORS
+## ⚙️ Configuration
 
-Por padrão, o servidor aceita conexões de `http://localhost:5173`. Para modificar, edite o arquivo `src/server.ts`:
+### Environment Variables
+
+Create a `.env` file in the project root with:
+
+```env
+OPENAI_API_KEY=your_openai_key_here
+```
+
+### CORS Configuration
+
+By default, the server accepts connections from `http://localhost:5173`. To modify, edit the `src/server.ts` file:
 
 ```typescript
+// In both Socket.io and Fastify CORS configuration
 cors: {
-  origin: 'http://seu-frontend-url.com',
+  origin: 'http://your-frontend-url.com',
 }
 ```
 
-## 🎮 Como Usar
+## 🎮 How to Use
 
-### Desenvolvimento
+### Development
 
 ```bash
 npm run dev
 ```
 
-### Produção
+### Production
 
 ```bash
 npm start
 ```
 
-O servidor iniciará na porta **3000** por padrão.
+The server will start on port **3000** by default.
 
-## 🏗️ Arquitetura
+## 🏗️ Architecture
 
-O projeto segue uma arquitetura modular com separação clara de responsabilidades:
+The project follows a modular architecture with clear separation of responsibilities:
 
 ```
-Cliente (Frontend) ←→ Socket.io ←→ AudioStreamingServer ←→ OpenAISessionHandler ←→ OpenAI Realtime API
+Client (Frontend) ←→ Socket.io ←→ AudioStreamingServer ←→ OpenAISessionHandler ←→ OpenAI Realtime API
 ```
 
-### Componentes Principais
+### Main Components
 
 1. **AudioStreamingServer** (`src/server.ts`)
-   - Gerencia conexões WebSocket
-   - Configura middleware e CORS
-   - Orquestra a comunicação entre cliente e OpenAI
+   - Manages WebSocket connections
+   - Configures middleware and CORS
+   - Orchestrates communication between client and OpenAI
 
 2. **OpenAISessionHandler** (`src/open-ai-session-handler.ts`)
-   - Gerencia sessões individuais com a OpenAI
-   - Processa eventos de áudio e texto
-   - Mantém estado da conversa
+   - Manages individual sessions with OpenAI
+   - Processes audio and text events
+   - Maintains conversation state
 
-## 🔌 Eventos WebSocket
+## 🔌 WebSocket Events
 
-### Eventos Ouvidos pelo Servidor
+### Events Listened by the Server
 
-| Evento | Descrição | Payload |
+| Event | Description | Payload |
 |--------|-----------|---------|
-| `start` | Inicia uma nova sessão com OpenAI | - |
-| `audio_chunk` | Recebe chunk de áudio do cliente | `string` (dados de áudio em base64) |
-| `stop` | Para o envio de áudio e finaliza entrada | - |
-| `disconnect` | Cliente desconectado | - |
+| `start` | Starts a new session with OpenAI | - |
+| `audio_chunk` | Receives audio chunk from client | `string` (base64 audio data) |
+| `stop` | Stops audio sending and finalizes input | - |
+| `disconnect` | Client disconnected | - |
 
-### Eventos Emitidos pelo Servidor
+### Events Emitted by the Server
 
-| Evento | Descrição | Payload |
+| Event | Description | Payload |
 |--------|-----------|---------|
-| `backend_ready` | Servidor pronto para receber áudio | `{ message: string }` |
-| `transcription_partial` | Transcrição parcial do áudio enviado | `string` |
-| `transcription_final` | Transcrição final do áudio enviado | `string` |
-| `response_transcript_partial` | Transcrição parcial da resposta da IA | `string` |
-| `response_transcript_final` | Transcrição final da resposta da IA | `string` |
-| `response_text_delta` | Texto parcial da resposta | `string` |
-| `response_text_final` | Texto final da resposta | `string` |
-| `response_audio` | Áudio da resposta da IA | `string[]` (chunks de áudio) |
-| `openai_error` | Erro da API OpenAI | `unknown` |
+| `backend_ready` | Server ready to receive audio | `{ message: string }` |
+| `transcription_final` | Final transcription of sent audio | `string` |
+| `response_transcript_partial` | Partial transcription of AI response | `ResponseAudioTranscriptDelta` |
+| `response_transcript_final` | Final transcription of AI response | `string` |
+| `response_text_delta` | Partial response text | `string` |
+| `response_text_final` | Final response text | `string` |
+| `response_audio_delta` | AI response audio chunk | `string` (individual chunk) |
+| `response_audio` | Complete AI response audio | `string[]` (all chunks) |
+| `openai_error` | OpenAI API error | `unknown` |
 
-### Fluxo de Comunicação
+### Communication Flow
 
 ```mermaid
 sequenceDiagram
-    participant C as Cliente
-    participant S as Servidor
+    participant C as Client
+    participant S as Server
     participant O as OpenAI
 
     C->>S: connect
-    S->>O: estabelece conexão WebSocket
+    S->>O: establish WebSocket connection
     O->>S: session.updated
     S->>C: backend_ready
 
     C->>S: start
     S->>O: session.update (config)
     
-    loop Streaming de Áudio
+    loop Audio Streaming
         C->>S: audio_chunk
         S->>O: input_audio_buffer.append
-        O->>S: transcription.delta
-        S->>C: transcription_partial
+        O->>S: conversation.item.input_audio_transcription.completed
+        S->>C: transcription_final
     end
 
     C->>S: stop
     S->>O: input_audio_buffer.commit
     
     O->>S: response.audio.delta
+    S->>C: response_audio_delta
+    O->>S: response.audio.done
     S->>C: response_audio
     O->>S: response.text.delta
     S->>C: response_text_delta
 ```
 
-## 🤖 API da OpenAI
+## 🤖 OpenAI API
 
-### Configuração da Sessão
+### Session Configuration
 
-O servidor configura automaticamente a sessão da OpenAI com:
+The server automatically configures the OpenAI session with:
 
-- **Modalidades:** Texto e áudio
-- **Idioma:** Português (forçado nas instruções)
-- **Voz:** Alloy
-- **Formato de entrada:** PCM16
-- **Formato de saída:** G.711 μ-law
-- **Detecção de turnos:** VAD (Voice Activity Detection) do servidor
-- **Temperatura:** 0.8
-- **Velocidade:** 1.1x
+- **Modalities:** Text and audio
+- **Model:** gpt-4o-realtime-preview-2024-12-17
+- **Language:** Portuguese (enforced in instructions)
+- **Voice:** Alloy
+- **Input format:** PCM16
+- **Output format:** PCM16
+- **Transcription model:** Whisper-1
+- **Turn detection:** Server VAD (Voice Activity Detection)
+- **Temperature:** 0.8
+- **Max response tokens:** Infinite
+- **Speed:** 1.1x
+- **VAD threshold:** 0.5
+- **Prefix padding:** 300ms
+- **Silence duration:** 500ms
+- **Create response:** Enabled
+- **Tracing:** Auto
 
-### Eventos Processados da OpenAI
+### Processed OpenAI Events
 
-- `session.updated` - Sessão configurada
-- `conversation.item.input_audio_transcription.*` - Transcrição do áudio de entrada
-- `response.audio_transcript.*` - Transcrição do áudio de resposta
-- `response.content_part.*` - Conteúdo textual da resposta
-- `response.audio.*` - Dados de áudio da resposta
-- `response.done` - Resposta finalizada
-- `error` - Erros da API
+- `session.updated` - Session configured
+- `conversation.item.input_audio_transcription.delta` - Partial input audio transcription
+- `conversation.item.input_audio_transcription.completed` - Complete input audio transcription
+- `response.audio_transcript.delta` - Partial response audio transcription
+- `response.audio_transcript.done` - Complete response audio transcription
+- `response.text.delta` - Partial textual response content
+- `response.content_part.done` - Complete textual response content
+- `response.audio.delta` - Response audio chunk
+- `response.audio.done` - Complete response audio
+- `response.done` - Response finished
+- `session.ended` - Session ended
+- `error` - API errors
 
-## 👨‍💻 Desenvolvimento
+## 👨‍💻 Development
 
-### Scripts Disponíveis
+### Available Scripts
 
-- `npm run dev` - Inicia o servidor em modo desenvolvimento com watch
-- `npm start` - Inicia o servidor em modo produção
+- `npm run dev` - Starts the server in development mode with watch and experimental TypeScript strip types
+- `npm start` - Starts the server in production mode with experimental TypeScript strip types
 
-### Ferramentas de Desenvolvimento
+Both scripts use Node.js experimental features and load environment variables from `.env` file automatically.
 
-- **TypeScript** - Tipagem estática
-- **Biome** - Linting e formatação
-- **Node.js experimental features** - Strip types nativo
+### Development Tools
 
-### Estrutura de Código
+- **TypeScript** - Static typing with experimental strip types (--experimental-strip-types)
+- **Biome** - Linting and formatting (extends ultracite configuration)
+- **Node.js experimental features** - Native TypeScript execution without compilation
+- **Environment variables** - Automatically loaded with --env-file flag
 
-O código utiliza classes e métodos bem organizados:
+### Code Structure
+
+The code uses well-organized classes and methods:
 
 ```typescript
-// Exemplo de uso dos handlers
-class OpenAISessionHandler {
-  handleResponseTextDelta(content: string) {
-    this.responseText += content
-    this.socket.emit('response_text_delta', content)
+// Example of session configuration
+createSessionConfig() {
+  return {
+    type: 'session.update',
+    session: {
+      modalities: ['text', 'audio'],
+      instructions: 'Your custom instructions here',
+      voice: 'alloy',
+      input_audio_format: 'pcm16',
+      output_audio_format: 'pcm16',
+      temperature: 0.8,
+      max_response_output_tokens: 'inf',
+      speed: 1.1,
+      // ... other configurations
+    }
   }
 }
 ```
 
-## 📁 Estrutura do Projeto
+## 📁 Project Structure
 
 ```
 audio-streaming-server/
 ├── src/
-│   ├── server.ts                    # Servidor principal
-│   └── open-ai-session-handler.ts   # Handler da sessão OpenAI
-├── biome.jsonc                      # Configuração do Biome
-├── index.js                         # Versão legacy (Express)
-├── package.json                     # Dependências e scripts
-├── tsconfig.json                    # Configuração TypeScript
-└── README.md                        # Este arquivo
+│   ├── server.ts                    # Main server with Fastify and Socket.io
+│   ├── open-ai-session-handler.ts   # OpenAI Realtime API session handler
+│   └── types.ts                     # TypeScript type definitions
+├── .env.example                     # Environment variables template
+├── biome.jsonc                      # Biome configuration
+├── package.json                     # Dependencies and scripts
+├── tsconfig.json                    # TypeScript configuration
+└── README.md                        # This file
 ```
 
-### Principais Arquivos
+### Main Files
 
-- **`src/server.ts`** - Ponto de entrada do servidor Fastify
-- **`src/open-ai-session-handler.ts`** - Lógica de integração com OpenAI
-- **`index.js`** - Implementação legacy com Express (não utilizada)
+- **`src/server.ts`** - Fastify server entry point with Socket.io
+- **`src/open-ai-session-handler.ts`** - OpenAI Realtime API integration logic
+- **`src/types.ts`** - TypeScript type definitions for OpenAI events
 
-## 🔧 Personalização
+## 🔧 Customization
 
-### Modificando a Configuração da IA
+### Modifying AI Configuration
 
-Para alterar o comportamento da IA, edite o método `createSessionConfig()` em `open-ai-session-handler.ts`:
+To change AI behavior, edit the `createSessionConfig()` method in `open-ai-session-handler.ts`:
 
 ```typescript
-{
-  instructions: 'Suas instruções personalizadas aqui',
-  voice: 'nova-voz',
-  temperature: 0.7,
-  // ... outras configurações
+createSessionConfig() {
+  return {
+    type: 'session.update',
+    session: {
+      instructions: 'Your custom instructions here',
+      voice: 'nova', // Available voices: alloy, nova, echo, fable, onyx, shimmer
+      temperature: 0.7,
+      speed: 1.0,
+      max_response_output_tokens: 4096, // or 'inf' for unlimited
+      // ... other configurations
+    }
+  }
 }
 ```
 
-### Adicionando Novos Eventos
+### Main Dependencies
 
-1. Adicione o handler no `eventHandlers` object
-2. Implemente o método correspondente
-3. Emita eventos para o cliente conforme necessário
+- **@fastify/cors** - CORS support for Fastify
+- **fastify** - Fast and efficient web framework
+- **socket.io** - WebSocket library for real-time communication
+- **ws** - WebSocket client for OpenAI Realtime API connection
 
-## 📝 Logs e Debugging
+### Development Dependencies
 
-O servidor produz logs detalhados para debugging:
+- **@biomejs/biome** - Fast linter and formatter
+- **@types/ws** - TypeScript definitions for ws
+- **ultracite** - Biome configuration preset
 
-- Conexões de clientes
-- Eventos da OpenAI
-- Estado das transcrições
-- Erros e exceções
+## � Troubleshooting
 
-Todos os logs são prefixados com informações contextuais para facilitar o debugging.
+### Common Issues
+
+**1. "WebSocket connection failed"**
+- Verify your OpenAI API key in the `.env` file
+- Ensure you have access to the OpenAI Realtime API
+- Check your internet connection
+
+**2. "CORS errors in browser"**
+- Update the origin in `src/server.ts` to match your frontend URL
+- Make sure both Socket.io and Fastify CORS settings are configured
+
+**3. "No audio received"**
+- Verify the client is sending audio in the correct format (PCM16)
+- Check browser permissions for microphone access
+- Ensure audio chunks are base64 encoded
+
+**4. "Server not starting"**
+- Check if port 3000 is already in use
+- Verify Node.js version (18+ required)
+- Run `npm install` to ensure all dependencies are installed
+
+### Logs and Debugging
+
+The server produces detailed logs for debugging:
+
+- Client connections and disconnections
+- OpenAI WebSocket events and responses  
+- Audio transcription progress
+- Error messages with context
+
+All logs are prefixed with contextual information to facilitate debugging.
 
 ---
 
-**Desenvolvido com ❤️ usando Node.js e TypeScript**
+<div align="center">
+
+**Built with ❤️ by [Alysson Barrera](https://github.com/alyssonbarrera)**
+
+⭐ **Star this repo if it helped you!** ⭐
+
+</div>
