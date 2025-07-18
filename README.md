@@ -2,16 +2,20 @@
 
 A real-time audio streaming server that integrates with OpenAI's Realtime API for transcription and generation of audio and text responses.
 
+
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
 - [Technologies Used](#-technologies-used)
 - [Prerequisites](#-prerequisites)
-- [Instal### Adding New Events
-
-1. Add the handler to the `eventHandlers` object in `OpenAISessionHandler`
-2. Implement the corresponding method to process the event
-3. Emit events to the client as needed using `this.socket.emit()`
+- [Installation](#-installation)
+- [Configuration](#-configuration)
+- [How to Use](#-how-to-use)
+- [Architecture](#-architecture)
+- [WebSocket Events](#-websocket-events)
+- [OpenAI API](#-openai-api)
+- [Development](#-development)
+- [Project Structure](#-project-structure)
 
 ### Main Dependencies
 
@@ -25,15 +29,6 @@ A real-time audio streaming server that integrates with OpenAI's Realtime API fo
 - **@biomejs/biome** - Fast linter and formatter
 - **@types/ws** - TypeScript definitions for ws
 - **ultracite** - Biome configuration preset
-
-## 🔧 Troubleshootingallation)
-- [Configuration](#-configuration)
-- [How to Use](#-how-to-use)
-- [Architecture](#-architecture)
-- [WebSocket Events](#-websocket-events)
-- [OpenAI API](#-openai-api)
-- [Development](#-development)
-- [Project Structure](#-project-structure)
 
 ## 🎯 Overview
 
